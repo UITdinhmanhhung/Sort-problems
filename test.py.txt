@@ -1,0 +1,122 @@
+import random
+import time
+
+# Function to generate a random array
+def generate_random_array(size):
+    return [random.uniform(0.0, 10000.0) for _ in range(size)]
+
+# Function to generate a sorted array
+def generate_sorted_array(size):
+    return list(range(size))
+
+# Function to generate a reverse sorted array
+def generate_reverse_sorted_array(size):
+    return list(range(size, 0, -1))
+
+# QuickSort implementation
+def quick_sort(arr):
+    if len(arr) <= 1:
+        return arr
+    pivot = arr[len(arr) // 2]
+    left = [x for x in arr if x < pivot]
+    middle = [x for x in arr if x == pivot]
+    right = [x for x in arr if x > pivot]
+    return quick_sort(left) + middle + quick_sort(right)
+
+# HeapSort implementation
+def heapify(arr, n, i):
+    largest = i
+    left = 2 * i + 1
+    right = 2 * i + 2
+
+    if left < n and arr[left] > arr[largest]:
+        largest = left
+
+    if right < n and arr[right] > arr[largest]:
+        largest = right
+
+    if largest != i:
+        arr[i], arr[largest] = arr[largest], arr[i]
+        heapify(arr, n, largest)
+
+def heap_sort(arr):
+    n = len(arr)
+    for i in range(n // 2 - 1, -1, -1):
+        heapify(arr, n, i)
+
+    for i in range(n - 1, 0, -1):
+        arr[i], arr[0] = arr[0], arr[i]
+        heapify(arr, i, 0)
+
+# MergeSort implementation
+def merge_sort(arr):
+    if len(arr) > 1:
+        mid = len(arr) // 2
+        left_half = arr[:mid]
+        right_half = arr[mid:]
+
+        merge_sort(left_half)
+        merge_sort(right_half)
+
+        i = j = k = 0
+
+        while i < len(left_half) and j < len(right_half):
+            if left_half[i] < right_half[j]:
+                arr[k] = left_half[i]
+                i += 1
+            else:
+                arr[k] = right_half[j]
+                j += 1
+            k += 1
+
+        while i < len(left_half):
+            arr[k] = left_half[i]
+            i += 1
+            k += 1
+
+        while j < len(right_half):
+            arr[k] = right_half[j]
+            j += 1
+            k += 1
+
+# Measure execution time
+def measure_time(sort_function, arr, sort_name, array_type):
+    start_time = time.time()
+    if sort_name == "HeapSort":
+        sort_function(arr)
+    else:
+        sort_function(arr.copy())
+    end_time = time.time()
+    print(f"{sort_name} on {array_type}: {round((end_time - start_time) * 1000, 2)} ms")
+
+# Main function
+def main():
+    size = 1000000
+
+    # Generate datasets
+    sorted_array = generate_sorted_array(size)
+    reverse_sorted_array = generate_reverse_sorted_array(size)
+    random_arrays = [generate_random_array(size) for _ in range(8)]
+
+    print("Comparison of execution times:")
+
+    # QuickSort
+    measure_time(quick_sort, sorted_array, "QuickSort", "ascending array")
+    measure_time(quick_sort, reverse_sorted_array, "QuickSort", "descending array")
+    for i, arr in enumerate(random_arrays):
+        measure_time(quick_sort, arr, "QuickSort", f"random array #{i+1}")
+
+    # HeapSort
+    measure_time(heap_sort, sorted_array.copy(), "HeapSort", "ascending array")
+    measure_time(heap_sort, reverse_sorted_array.copy(), "HeapSort", "descending array")
+    for i, arr in enumerate(random_arrays):
+        measure_time(heap_sort, arr.copy(), "HeapSort", f"random array #{i+1}")
+
+    # MergeSort
+    measure_time(merge_sort, sorted_array, "MergeSort", "ascending array")
+    measure_time(merge_sort, reverse_sorted_array, "MergeSort", "descending array")
+    for i, arr in enumerate(random_arrays):
+        measure_time(merge_sort, arr, "MergeSort", f"random array #{i+1}")
+
+if __name__ == "__main__":
+    main()
